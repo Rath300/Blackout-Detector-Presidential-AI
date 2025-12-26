@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align: center;">
+    <h1 class="main-title">☀️ SOLIXA</h1>
+</div>
+<div style="text-align: center;">
+    <h2 class="tagline">Decode the Sun.</h2>
+</div>
+
+<div class="grid-2" style="margin-top: 3rem;">
+    <div class="blue-card">
+        <h2 style="color: #1e3a8a;">🌟 Why Solixa?</h2>
+        <p style="font-size: 1.1rem; color: #1e40af; line-height: 1.8;">
+        We created Solixa because solar data analysis shouldn't require technical expertise. The inspiration 
+        came from recognizing a growing gap between the potential of renewable energy and the accessibility 
+        of tools to manage it. While volunteering with a local sustainability group, we met energy analysts 
+        who spent hours cleaning and interpreting datasets. Many community solar projects and homeowners were 
+        collecting valuable data but lacked the means to interpret it in real time.
+        </p>
+        <p style="font-size: 1.1rem; color: #1e40af; margin-top: 1rem; font-weight: 600;">
+        That sparked our idea: bring advanced machine learning within reach of anyone involved in solar energy. 
+        No technical knowledge needed. Just upload your data and get instant, meaningful insights.
+        </p>
+    </div>
+    
+    <div>
+        <div class="metric-card-dark">
+            <h3 style="color: white; font-size: 1.3rem; margin-bottom: 0.5rem;">🤖 AI-Powered Analysis</h3>
+            <p style="color: rgba(255,255,255,0.9); font-size: 1rem;">
+            Advanced machine learning algorithms detect anomalies, predict future production, and provide actionable insights automatically.
+            </p>
+        </div>
+        
+        <div class="metric-card-light">
+            <h3 style="color: white; font-size: 1.3rem; margin-bottom: 0.5rem;">📊 Visual Analytics</h3>
+            <p style="color: rgba(255,255,255,0.9); font-size: 1rem;">
+            Interactive charts and statistical summaries make complex data easy to understand at a glance.
+            </p>
+        </div>
+        
+        <div class="metric-card-yellow">
+            <h3 style="color: #1e3a8a; font-size: 1.3rem; margin-bottom: 0.5rem;">⚡ Real-Time Insights</h3>
+            <p style="color: #1e3a8a; font-size: 1rem;">
+            Upload your CSV and get instant analysis. No waiting, no complex setup, no technical knowledge required.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 3rem;">
+    <h2 class="section-header">🚀 How It Works</h2>
+    
+    <div class="grid-3">
+        <div class="yellow-card">
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                <span class="step-number">1</span>
+                <h3 style="color: #1e3a8a; margin: 0;">Upload Your Data</h3>
+            </div>
+            <p style="color: #1e40af; font-size: 1.05rem;">
+            Upload your solar panel CSV file using the sidebar. We support various formats and automatically detect your data structure.
+            </p>
+        </div>
+        
+        <div class="yellow-card">
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                <span class="step-number">2</span>
+                <h3 style="color: #1e3a8a; margin: 0;">Analyze & Explore</h3>
+            </div>
+            <p style="color: #1e40af; font-size: 1.05rem;">
+            View comprehensive statistics, detect anomalies, and analyze inverter performance with our AI-powered tools.
+            </p>
+        </div>
+        
+        <div class="yellow-card">
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                <span class="step-number">3</span>
+                <h3 style="color: #1e3a8a; margin: 0;">Get Insights</h3>
+            </div>
+            <p style="color: #1e40af; font-size: 1.05rem;">
+            Receive actionable recommendations and forecasts to optimize your solar energy system performance.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 3rem;">
+    <h2 class="section-header">✨ Key Features</h2>
+    
+    <div class="grid-2">
+        <div class="blue-card">
+            <h3 style="color: #1e3a8a;">🔍 Automated Anomaly Detection</h3>
+            <p style="color: #1e40af; font-size: 1.05rem; line-height: 1.7;">
+            Our Isolation Forest algorithm identifies unusual patterns in your solar data, helping you catch issues before they become problems. 
+            Get detailed analysis of efficiency anomalies by inverter with interactive visualizations.
+            </p>
+        </div>
+        
+        <div class="blue-card">
+            <h3 style="color: #1e3a8a;">📈 Advanced Forecasting</h3>
+            <p style="color: #1e40af; font-size: 1.05rem; line-height: 1.7;">
+            Choose from multiple ML models (Gradient Boosting, Random Forest, Linear Regression) to predict future solar production. 
+            View accuracy metrics and confidence intervals for reliable planning.
+            </p>
+        </div>
+        
+        <div class="blue-card">
+            <h3 style="color: #1e3a8a;">⚡ Inverter Performance Analysis</h3>
+            <p style="color: #1e40af; font-size: 1.05rem; line-height: 1.7;">
+            Automatically group inverters by performance quartiles. Identify top performers and units that need attention. 
+            Get detailed statistics on average output, peak power, and efficiency.
+            </p>
+        </div>
+        
+        <div class="blue-card">
+            <h3 style="color: #1e3a8a;">💡 AI-Generated Insights</h3>
+            <p style="color: #1e40af; font-size: 1.05rem; line-height: 1.7;">
+            Receive natural language explanations of your data patterns, system health assessments, and actionable recommendations. 
+            No data science degree required to understand your solar system's performance.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 3rem; text-align: center;">
+    <div class="info-box" style="max-width: 800px; margin: 0 auto;">
+        <h3 style="color: white; font-size: 1.5rem;">👈 Get Started Now!</h3>
+        <p style="color: white; font-size: 1.1rem; line-height: 1.7;">
+        Upload your solar data CSV file using the sidebar to begin your analysis. 
+        Our intelligent system will automatically detect your data format and provide instant insights.
+        </p>
+    </div>
+</div>
+{% endblock %}
+

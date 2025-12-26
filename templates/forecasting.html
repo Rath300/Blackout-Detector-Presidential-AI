@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align: center;">
+    <h1 class="main-title">📈 FORECASTING</h1>
+</div>
+
+{% if no_data %}
+<div class="info-box" style="max-width: 800px; margin: 3rem auto;">
+    <h3 style="color: white;">👈 Upload Your Solar Data to Get Started</h3>
+    <p style="color: white; font-size: 1.1rem;">Use the file uploader in the sidebar to begin analyzing your solar panel performance.</p>
+</div>
+{% elif error %}
+<div class="warning-box" style="max-width: 800px; margin: 3rem auto;">
+    <h3>❌ Error</h3>
+    <p style="font-size: 1.1rem;">{{ error }}</p>
+    <p style="font-size: 1rem; margin-top: 0.5rem;">💡 Tip: Forecasting requires at least 50 data points for reliable predictions. Try uploading more data.</p>
+</div>
+{% else %}
+
+<div class="blue-card" style="margin-top: 2rem;">
+    <h3 style="color: #1e3a8a;">🔮 How Our Forecasting Works</h3>
+    <p style="color: #1e40af; font-size: 1.05rem; line-height: 1.7;">
+    We use advanced machine learning algorithms to predict your solar panel output based on historical patterns. 
+    Our models analyze temporal features (time of day, day of week, seasonality), rolling averages, and sequential 
+    patterns to generate accurate forecasts. This helps you plan energy usage, identify potential issues, and 
+    understand when production might be lower than expected.
+    </p>
+    <p style="color: #1e40af; font-size: 1.05rem; line-height: 1.7; margin-top: 1rem;">
+    <strong>Current Model:</strong> {{ forecast_model_display }} — Selected for optimal balance of accuracy and performance for your dataset.
+    </p>
+</div>
+
+<div style="margin-top: 2rem;">
+    <h3 class="section-header">📊 Forecast Accuracy Metrics</h3>
+    
+    <div class="grid-4">
+        <div class="metric-card-dark">
+            <h4 style="color: white; margin: 0;">R² Score</h4>
+            <h2 style="color: white; margin: 0.5rem 0;">{{ metrics.r2|floatformat:3 }}</h2>
+            <p style="color: rgba(255,255,255,0.8); margin: 0;">Model accuracy</p>
+        </div>
+        
+        <div class="metric-card-light">
+            <h4 style="color: white; margin: 0;">RMSE</h4>
+            <h2 style="color: white; margin: 0.5rem 0;">{{ metrics.rmse|floatformat:2 }}</h2>
+            <p style="color: rgba(255,255,255,0.8); margin: 0;">Root mean sq error</p>
+        </div>
+        
+        <div class="metric-card-yellow">
+            <h4 style="color: #1e3a8a; margin: 0;">MAPE</h4>
+            <h2 style="color: #1e3a8a; margin: 0.5rem 0;">{{ metrics.mape|floatformat:1 }}%</h2>
+            <p style="color: #1e3a8a; margin: 0;">Avg prediction error</p>
+        </div>
+        
+        <div class="metric-card-dark">
+            <h4 style="color: white; margin: 0;">CV Score</h4>
+            <h2 style="color: white; margin: 0.5rem 0;">{{ metrics.cv_mean|floatformat:3 }}</h2>
+            <p style="color: rgba(255,255,255,0.8); margin: 0;">Cross-validation</p>
+        </div>
+    </div>
+    
+    {% if metrics.r2 > 0.85 %}
+    <div class="success-box" style="margin-top: 1rem;">
+        <h4 style="margin-top: 0;">📈 Model Performance Assessment</h4>
+        <p style="font-size: 1.1rem; margin: 0;">🌟 Excellent forecasting accuracy! Your predictions are highly reliable.</p>
+    </div>
+    {% elif metrics.r2 > 0.7 %}
+    <div class="info-box" style="margin-top: 1rem;">
+        <h4 style="margin-top: 0;">📈 Model Performance Assessment</h4>
+        <p style="font-size: 1.1rem; margin: 0;">✅ Good forecasting accuracy. Predictions are generally reliable.</p>
+    </div>
+    {% elif metrics.r2 > 0.5 %}
+    <div class="warning-box" style="margin-top: 1rem;">
+        <h4 style="margin-top: 0;">📈 Model Performance Assessment</h4>
+        <p style="font-size: 1.1rem; margin: 0;">⚠️ Moderate accuracy. Consider collecting more data for better predictions.</p>
+    </div>
+    {% elif metrics.r2 > 0 %}
+    <div class="warning-box" style="margin-top: 1rem;">
+        <h4 style="margin-top: 0;">📈 Model Performance Assessment</h4>
+        <p style="font-size: 1.1rem; margin: 0;">❗ Limited accuracy. Try a different model or collect more historical data.</p>
+    </div>
+    {% else %}
+    <div class="warning-box" style="margin-top: 1rem;">
+        <h4 style="margin-top: 0;">📈 Model Performance Assessment</h4>
+        <p style="font-size: 1.1rem; margin: 0;">❌ Negative R² indicates this model type is not suitable for your data's patterns. Please select a different forecasting model.</p>
+    </div>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <h3 class="section-header">📊 Forecast vs Actual Comparison</h3>
+    <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+        {{ forecast_chart_html|safe }}
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <h3 class="section-header">📉 Prediction Error Analysis</h3>
+    
+    <div class="grid-2">
+        <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+            {{ error_chart_html|safe }}
+        </div>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+            {{ pct_error_chart_html|safe }}
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <h3 class="section-header">🎯 Detailed Forecast Statistics</h3>
+    
+    <div class="grid-2">
+        <div class="blue-card">
+            <h4 style="color: #1e3a8a; margin-top: 0;">📊 Statistical Summary</h4>
+            <ul style="color: #1e40af; font-size: 1.05rem; line-height: 2;">
+                <li><strong>Test Points:</strong> {{ metrics.test_points|floatformat:0 }}</li>
+                <li><strong>Mean Absolute Error:</strong> {{ metrics.mae|floatformat:2 }} kW</li>
+                <li><strong>Training R²:</strong> {{ metrics.train_r2|floatformat:3 }}</li>
+                <li><strong>CV Std Dev:</strong> {{ metrics.cv_std|floatformat:3 }}</li>
+            </ul>
+        </div>
+        
+        <div class="yellow-card">
+            <h4 style="color: #1e3a8a; margin-top: 0;">💡 Interpretation Guide</h4>
+            <p style="color: #1e40af; font-size: 1.05rem; line-height: 1.7;">
+            <strong>R² Score:</strong> Measures prediction accuracy (1.0 = perfect, 0.0 = poor)<br>
+            <strong>RMSE:</strong> Average prediction error magnitude<br>
+            <strong>MAPE:</strong> Average percentage difference from actual values<br>
+            <strong>CV Score:</strong> Model consistency across different data subsets
+            </p>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <div class="ai-insight-card">
+        <h3>🤖 Complete AI Analysis with Forecasting</h3>
+        <div style="color: #1e40af; font-size: 1.05rem; line-height: 1.9;">
+            {{ comprehensive_summary|safe }}
+        </div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
