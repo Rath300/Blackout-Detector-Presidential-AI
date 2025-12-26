@@ -125,3 +125,4 @@ def run_forecast(df, model_type='gradient_boosting'):
     except Exception as e:
         return pd.DataFrame(), {}, str(e)
 
+

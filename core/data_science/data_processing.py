@@ -132,3 +132,4 @@ def load_clean_data(file_path):
     
     return df, None, detected_columns
 
+

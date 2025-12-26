@@ -14,3 +14,4 @@ urlpatterns = [
     path('update-settings/', views.update_settings, name='update_settings'),
 ]
 
+

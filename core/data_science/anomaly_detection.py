@@ -144,3 +144,4 @@ def detect_efficiency_anomalies(df, contamination=DEFAULT_CONTAMINATION):
     except Exception as e:
         return None, f"Error in efficiency anomaly detection: {str(e)}"
 
+

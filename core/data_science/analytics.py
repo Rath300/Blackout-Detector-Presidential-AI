@@ -327,3 +327,4 @@ def analyze_inverter_performance(df):
     except Exception as e:
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), {}
 
+
