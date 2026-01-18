@@ -1,0 +1,9 @@
+date,state,customers_affected,incident_type,description
+2024-01-12,TX,120000,Severe Weather,Ice storm impacts transmission lines
+2024-02-03,LA,45000,Severe Weather,High winds and downed lines
+2024-03-18,CA,80000,Severe Weather,Atmospheric river storm
+2024-04-05,NY,35000,Equipment Failure,Substation failure
+2024-05-22,FL,92000,Severe Weather,Thunderstorms and flooding
+2024-06-11,IL,40000,Severe Weather,Wind damage to distribution lines
+2024-07-29,GA,60000,Severe Weather,Heat-related grid stress
+2024-08-16,NC,28000,Severe Weather,Remnants of tropical storm

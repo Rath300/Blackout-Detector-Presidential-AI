@@ -1,0 +1,5 @@
+2000,2010,2014,2020
+Census tract data only,County and census tract data,County and census tract data,County and census tract data
+Nationwide comparison only,Statewide and nationwide data,Statewide and nationwide data,Statewide and nationwide data
+Data derived from the U.S. Census Bureau decennial census long form,Data derived from the decennial census and the 5-year American Community Survey (ACS),Data derived from the 5-year ACS only,Data derived from the 5-year ACS only
+15 variables used,14 variables used (disability data were not collected by the Census Bureau at the tract level rom either the 2010 Census or the 2006-2010 ACS),15 variables used (disability data were available and added back in),"16 variables used (100% poverty was replaced by 150% poverty, no health insurance was added, housing cost burden was added, income was removed)"

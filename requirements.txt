@@ -1,1 +1,10 @@
 streamlit
+Django==2.2.28
+django-cors-headers
+numpy
+pandas
+requests
+scikit-learn
+twilio
+python-dotenv
+matplotlib
