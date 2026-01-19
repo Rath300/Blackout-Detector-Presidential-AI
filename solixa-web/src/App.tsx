@@ -5,13 +5,6 @@ import { MapContainer, TileLayer, GeoJSON, CircleMarker, Popup, useMapEvents } f
 import type { GeoJsonObject } from "geojson"
 import "leaflet/dist/leaflet.css"
 import {
-  AlertTriangle,
-  DownloadCloud,
-  MapPin,
-  PhoneCall,
-  UploadCloud,
-} from "lucide-react"
-import {
   LineChart,
   Line,
   CartesianGrid,
@@ -26,20 +19,6 @@ import { FileUpload } from "@/components/ui/file-upload"
 import MorphPanel from "@/components/ui/ai-input"
 import { TextShimmer } from "@/components/ui/text-shimmer"
 import { SpotlightNav } from "@/components/ui/spotlight-button"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -50,14 +29,6 @@ const emergencyAreas = [
   { name: "SF EMS Station 1", type: "ems", lat: 37.7946, lon: -122.3999 },
   { name: "Lowell High School", type: "school", lat: 37.7325, lon: -122.4856 },
   { name: "SOMA Shelter", type: "shelter", lat: 37.7786, lon: -122.4062 },
-]
-
-const navItems = [
-  { label: "Overview", icon: MapPin },
-  { label: "Risk Map", icon: AlertTriangle },
-  { label: "Inverter Upload", icon: UploadCloud },
-  { label: "Alerts", icon: PhoneCall },
-  { label: "Exports", icon: DownloadCloud },
 ]
 
 type RiskItem = {
@@ -76,6 +47,10 @@ type CountyRisk = {
 
 export default function App() {
   const heroRef = useRef<HTMLDivElement>(null)
+  const riskMapRef = useRef<HTMLDivElement>(null)
+  const inverterRef = useRef<HTMLDivElement>(null)
+  const alertsRef = useRef<HTMLDivElement>(null)
+  const modelRef = useRef<HTMLDivElement>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [stateCode, setStateCode] = useState("")
   const [mapCenter, setMapCenter] = useState<[number, number]>([39.8283, -98.5795])
@@ -368,46 +343,22 @@ export default function App() {
     setChatResponse(data.response || "No response.")
   }
 
-  return (
-    <SidebarProvider defaultOpen>
-      <Sidebar variant="floating">
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>Solixa</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {navItems.map((item) => (
-                  <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton>
-                      <item.icon className="text-emerald-600" />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-        <SidebarFooter>
-          <SidebarGroup>
-            <SidebarMenuButton className="w-full justify-between gap-3 h-12">
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-emerald-100" />
-                <div className="flex flex-col items-start">
-                  <span className="text-sm font-medium">Emergency Ops</span>
-                  <span className="text-xs text-slate-400">community@solixa.ai</span>
-                </div>
-              </div>
-            </SidebarMenuButton>
-          </SidebarGroup>
-        </SidebarFooter>
-      </Sidebar>
+  const handleNavigate = (label: string) => {
+    const sections: Record<string, React.RefObject<HTMLDivElement>> = {
+      Overview: heroRef,
+      "Risk Map": riskMapRef,
+      "Inverter Upload": inverterRef,
+      Alerts: alertsRef,
+      Settings: modelRef,
+    }
+    sections[label]?.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
-      <SidebarInset className="px-8 py-10">
-        <div className="flex items-center justify-between">
-          <SidebarTrigger />
-          <SpotlightNav />
-        </div>
+  return (
+    <div className="px-8 py-10">
+      <div className="flex items-center justify-end">
+        <SpotlightNav onNavigate={handleNavigate} />
+      </div>
 
         <div
           ref={heroRef}
@@ -455,7 +406,7 @@ export default function App() {
         </div>
 
         <div className="mt-10 grid gap-8 md:grid-cols-[2fr_1fr]">
-          <div className="rounded-3xl bg-white p-6 shadow-sm border border-emerald-100">
+          <div ref={riskMapRef} className="rounded-3xl bg-white p-6 shadow-sm border border-emerald-100">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <h2 className="text-xl font-semibold text-emerald-700">Risk Map</h2>
               <div className="flex gap-2">
@@ -605,7 +556,7 @@ export default function App() {
           </div>
 
           <div className="space-y-6">
-            <div className="rounded-3xl bg-white p-6 shadow-sm border border-emerald-100">
+            <div ref={inverterRef} className="rounded-3xl bg-white p-6 shadow-sm border border-emerald-100">
               <h3 className="text-lg font-semibold text-emerald-700">Inverter Anomaly Upload</h3>
               <p className="text-sm text-slate-500 mt-2">{anomalySummary}</p>
               <div className="mt-4">
@@ -657,7 +608,7 @@ export default function App() {
                 )}
               </div>
             </div>
-            <div className="rounded-3xl bg-white p-6 shadow-sm border border-emerald-100">
+            <div ref={alertsRef} className="rounded-3xl bg-white p-6 shadow-sm border border-emerald-100">
               <h3 className="text-lg font-semibold text-emerald-700">Automated Alerting</h3>
               <p className="text-sm text-slate-500 mt-2">
                 Trigger a real SMS via Twilio once the risk surpasses thresholds.
@@ -670,7 +621,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="mt-10 rounded-3xl bg-white p-6 shadow-sm border border-emerald-100">
+        <div ref={modelRef} className="mt-10 rounded-3xl bg-white p-6 shadow-sm border border-emerald-100">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <h3 className="text-lg font-semibold text-emerald-700">Emergency Area Auto-Scoring</h3>
             <div className="flex gap-2">
@@ -771,7 +722,6 @@ export default function App() {
             </div>
           )}
         </div>
-      </SidebarInset>
-    </SidebarProvider>
+    </div>
   )
 }

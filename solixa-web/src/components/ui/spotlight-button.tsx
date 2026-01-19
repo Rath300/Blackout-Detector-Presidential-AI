@@ -41,7 +41,11 @@ const NavItem: React.FC<NavItemProps> = ({
   )
 }
 
-export const SpotlightNav = () => {
+type SpotlightNavProps = {
+  onNavigate?: (label: string) => void
+}
+
+export const SpotlightNav = ({ onNavigate }: SpotlightNavProps) => {
   const [activeIndex, setActiveIndex] = useState(0)
 
   const navItems = [
@@ -67,7 +71,10 @@ export const SpotlightNav = () => {
           key={item.label}
           icon={item.icon}
           isActive={activeIndex === index}
-          onClick={() => setActiveIndex(index)}
+          onClick={() => {
+            setActiveIndex(index)
+            onNavigate?.(item.label)
+          }}
           indicatorPosition={activeIndex}
           position={index}
         />
