@@ -70,7 +70,7 @@ export const FileUpload = ({
         </div>
         <div className="flex flex-col items-center justify-center">
           <p className="relative z-20 font-medium text-emerald-700 text-base">
-            Upload inverter CSV
+            Upload energy asset CSV
           </p>
           <p className="relative z-20 font-normal text-slate-500 text-sm mt-2">
             Drag or drop a file, or click to choose one

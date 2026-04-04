@@ -25,7 +25,7 @@ const NavItem: React.FC<NavItemProps> = ({
       onClick={onClick}
     >
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-24 bg-gradient-to-b from-emerald-200/60 to-transparent blur-lg rounded-full transition-opacity duration-400"
+        className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-24 bg-gradient-to-b from-green-200/60 to-transparent blur-lg rounded-full transition-opacity duration-400"
         style={{
           opacity: spotlightOpacity,
           transitionDelay: isActive ? "0.1s" : "0s",
@@ -33,7 +33,7 @@ const NavItem: React.FC<NavItemProps> = ({
       />
       <Icon
         className={`w-6 h-6 transition-colors duration-200 ${
-          isActive ? "text-emerald-700" : "text-emerald-300 hover:text-emerald-500"
+          isActive ? "text-green-700" : "text-stone-400 hover:text-green-700"
         }`}
         strokeWidth={isActive ? 2.5 : 2}
       />
@@ -51,15 +51,15 @@ export const SpotlightNav = ({ onNavigate }: SpotlightNavProps) => {
   const navItems = [
     { icon: Home, label: "Overview" },
     { icon: MapPin, label: "Risk Map" },
-    { icon: Upload, label: "Inverter Upload" },
+    { icon: Upload, label: "Energy Upload" },
     { icon: AlertTriangle, label: "Alerts" },
     { icon: Settings, label: "Settings" },
   ]
 
   return (
-    <nav className="relative flex items-center px-2 py-3 bg-white/80 backdrop-blur-sm rounded-full shadow-sm border border-emerald-100">
+    <nav className="relative flex items-center px-2 py-1.5 bg-white rounded-full border border-stone-200">
       <div
-        className="absolute top-0 h-[2px] bg-emerald-500 transition-all duration-400 ease-in-out"
+        className="absolute top-0 h-[2px] bg-green-700 transition-all duration-400 ease-in-out"
         style={{
           left: `${activeIndex * 56 + 18}px`,
           width: "40px",

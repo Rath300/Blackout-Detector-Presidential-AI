@@ -2,8 +2,48 @@ date,state,customers_affected,incident_type,description
 2024-01-12,TX,120000,Severe Weather,Ice storm impacts transmission lines
 2024-02-03,LA,45000,Severe Weather,High winds and downed lines
 2024-03-18,CA,80000,Severe Weather,Atmospheric river storm
-2024-04-05,NY,35000,Equipment Failure,Substation failure
-2024-05-22,FL,92000,Severe Weather,Thunderstorms and flooding
-2024-06-11,IL,40000,Severe Weather,Wind damage to distribution lines
-2024-07-29,GA,60000,Severe Weather,Heat-related grid stress
-2024-08-16,NC,28000,Severe Weather,Remnants of tropical storm
+2024-04-05,FL,65000,Severe Weather,Tornado outbreak
+2024-05-22,OH,30000,Equipment Failure,Substation transformer failure
+2024-06-15,TX,250000,Severe Weather,Derecho storm system
+2024-07-04,AZ,40000,Equipment Failure,Heat-related transformer overload
+2024-08-10,NC,55000,Severe Weather,Hurricane remnants
+2024-09-02,WA,22000,Severe Weather,Windstorm event
+2024-10-14,NY,70000,Severe Weather,Nor'easter wind and ice
+2024-11-05,CA,95000,Severe Weather,Bomb cyclone coastal storm
+2024-12-20,TX,180000,Severe Weather,Winter storm power outage
+2025-01-08,MI,48000,Severe Weather,Ice storm and freezing rain
+2025-02-14,TX,310000,Severe Weather,Arctic blast demand surge
+2025-03-01,FL,42000,Severe Weather,Severe thunderstorm system
+2025-04-10,CA,67000,Equipment Failure,High-voltage line failure
+2025-05-05,OK,38000,Severe Weather,Tornado and hail event
+2025-06-18,AZ,90000,Equipment Failure,Extreme heat grid stress
+2025-07-12,TX,200000,Severe Weather,Heat wave demand spike
+2025-08-25,LA,130000,Severe Weather,Hurricane landfall
+2025-09-15,WA,28000,Severe Weather,Pacific windstorm
+2025-10-03,NY,55000,Severe Weather,Early winter storm
+2025-11-20,MI,40000,Severe Weather,Lake-effect snowstorm
+2025-12-15,CO,35000,Severe Weather,Mountain snowstorm blackouts
+2024-01-25,GA,30000,Severe Weather,Ice storm Atlanta metro
+2024-02-20,IL,45000,Severe Weather,Winter storm Chicago
+2024-03-28,KY,25000,Severe Weather,Severe thunderstorm
+2024-04-22,TN,32000,Severe Weather,Tornado outbreak
+2024-05-18,MO,28000,Severe Weather,Severe thunderstorm hail
+2024-06-30,NE,20000,Severe Weather,Derecho storm Nebraska
+2024-07-19,PA,50000,Equipment Failure,Transmission equipment failure
+2024-08-28,VA,35000,Severe Weather,Tropical storm remnants
+2024-09-14,OR,18000,Severe Weather,Windstorm coastal
+2024-10-25,MD,42000,Severe Weather,Nor'easter
+2024-11-18,IN,22000,Severe Weather,Ice storm
+2024-12-08,WI,30000,Severe Weather,Winter blizzard
+2025-01-20,AR,25000,Severe Weather,Ice storm Arkansas
+2025-02-28,MN,40000,Severe Weather,Polar vortex cold snap
+2025-03-14,IA,15000,Severe Weather,Spring ice storm
+2025-04-28,KS,22000,Severe Weather,Tornado multiple counties
+2025-05-25,AL,38000,Severe Weather,Severe thunderstorm line
+2025-06-10,SC,30000,Severe Weather,Heat wave transformer failure
+2025-07-25,NV,25000,Equipment Failure,Extreme heat equipment
+2025-08-12,ID,12000,Severe Weather,Wildfire-related outages
+2025-09-28,NM,18000,Severe Weather,Flash flooding
+2025-10-18,UT,20000,Severe Weather,Early season snowstorm
+2025-11-08,MA,35000,Severe Weather,Nor'easter
+2025-12-28,MT,15000,Severe Weather,Blizzard conditions

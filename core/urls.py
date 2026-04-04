@@ -15,6 +15,7 @@ urlpatterns = [
     path("model/metrics", views.model_metrics, name="model_metrics"),
     path("model/evaluation", views.model_evaluation, name="model_evaluation"),
     path("chat/county", views.county_chat, name="county_chat"),
+    path("fips-lookup", views.fips_lookup, name="fips_lookup"),
     path("alerts/subscribe", views.alert_subscribe, name="alert_subscribe"),
     path("alerts/test", views.alert_test, name="alert_test"),
 ]

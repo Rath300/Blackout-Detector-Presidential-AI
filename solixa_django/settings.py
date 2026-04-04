@@ -131,3 +131,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+from sklearn.ensemble import GradientBoostingClassifier
+def train_risk_model(df):
+    X = df[["MAGNITUDE", "BEGIN_LAT", "BEGIN_LON", "SVI_SCORE"]].fillna(0)
+    y = df["POWER_OUTAGE_LIKELY"]
+    model = GradientBoostingClassifier(
+        n_estimators=300,
+        learning_rate=0.1,
+        max_depth=5,
+        random_state=42 )
+    model.fit(X, y)
+    feature_importance = dict(zip(X.columns, model.feature_importances_))
+    return model, feature_importance
