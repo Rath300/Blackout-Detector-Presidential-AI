@@ -37,9 +37,13 @@ def get_open_meteo_forecast(lat, lon, hours=72):
 
 def get_nws_alerts(lat, lon):
     params = {"point": f"{lat},{lon}"}
-    response = requests.get(NWS_ALERTS_URL, params=params, headers=NWS_HEADERS, timeout=15)
-    response.raise_for_status()
-    return response.json()
+    try:
+        response = requests.get(NWS_ALERTS_URL, params=params, headers=NWS_HEADERS, timeout=8)
+        response.raise_for_status()
+        return response.json()
+    except Exception:
+        # NWS frequently times out — return empty alerts rather than crashing
+        return {"features": []}
 
 
 def summarize_weather_risk(forecast_json, alerts_json, energy_source=None):
