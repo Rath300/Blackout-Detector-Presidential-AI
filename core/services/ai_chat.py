@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+import json
 import requests
 
 try:
@@ -10,9 +11,10 @@ except ImportError:
 
 
 DEFAULT_SYSTEM_PROMPT = (
-    "You are Solixa, an emergency preparedness assistant specializing in power grid "
-    "reliability and blackout risk. Given county-level risk data, summarize the situation "
-    "and provide 3-5 concise, practical preparedness steps. Be factual and community-focused."
+    "You are Solixa, a power grid emergency assistant. "
+    "Given county risk data, respond in under 120 words: "
+    "one sentence on current risk, then 3 bullet-point action steps. "
+    "Be direct and practical."
 )
 
 
@@ -20,41 +22,96 @@ DEFAULT_SYSTEM_PROMPT = (
 def _try_azure(user_text: str) -> str | None:
     endpoint = os.environ.get("AZURE_OPENAI_RESPONSES_URL")
     api_key  = os.environ.get("AZURE_OPENAI_KEY")
-    model    = os.environ.get("AZURE_OPENAI_MODEL", "gpt-5-mini-2")
+    model    = os.environ.get("AZURE_OPENAI_MODEL", "gpt-4o-mini")
     if not endpoint or not api_key:
+        print("[ai_chat] Azure skipped — AZURE_OPENAI_RESPONSES_URL or AZURE_OPENAI_KEY not set")
         return None
 
+    # Try Responses API format first (newer models)
     payload = {
         "model": model,
         "input": [
             {"role": "system", "content": [{"type": "input_text", "text": DEFAULT_SYSTEM_PROMPT}]},
             {"role": "user",   "content": [{"type": "input_text", "text": user_text}]},
         ],
-        "max_output_tokens": 800,
-        "reasoning": {"effort": "low"},
+        "max_output_tokens": 300,
     }
+    print(f"[ai_chat] Trying Azure endpoint: {endpoint[:60]}... model={model}")
     resp = requests.post(
         endpoint,
         headers={"Content-Type": "application/json", "api-key": api_key},
         json=payload,
         timeout=30,
     )
+    print(f"[ai_chat] Azure HTTP {resp.status_code}")
     if resp.status_code >= 400:
-        raise ValueError(f"Azure OpenAI error {resp.status_code}: {resp.text}")
-    data = resp.json()
+        error_body = resp.text[:500]
+        print(f"[ai_chat] Azure error body: {error_body}")
+        # If Responses API is not supported, fall back to Chat Completions on the same endpoint
+        base_url = endpoint.split("/openai/responses")[0]
+        chat_url = f"{base_url}/openai/deployments/{model}/chat/completions?api-version=2024-02-15-preview"
+        print(f"[ai_chat] Retrying as Chat Completions: {chat_url[:60]}...")
+        chat_payload = {
+            "messages": [
+                {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
+                {"role": "user",   "content": user_text},
+            ],
+            "max_tokens": 800,
+        }
+        chat_resp = requests.post(
+            chat_url,
+            headers={"Content-Type": "application/json", "api-key": api_key},
+            json=chat_payload,
+            timeout=30,
+        )
+        print(f"[ai_chat] Azure Chat Completions HTTP {chat_resp.status_code}")
+        if chat_resp.status_code >= 400:
+            print(f"[ai_chat] Azure Chat Completions error: {chat_resp.text[:500]}")
+            raise ValueError(f"Azure OpenAI error {chat_resp.status_code}: {chat_resp.text[:300]}")
+        data = chat_resp.json()
+        return data["choices"][0]["message"]["content"]
 
-    # Parse output from multiple possible response shapes
-    if data.get("output_text"):
-        return data["output_text"]
-    for item in data.get("output", []):
-        if item.get("type") == "output_text" and item.get("text"):
-            return item["text"]
-        for block in item.get("content", []):
-            if block.get("type") in {"output_text", "text"} and block.get("text"):
-                return block["text"]
+    data = resp.json()
+    print(f"[ai_chat] Azure status={data.get('status')} keys={list(data.keys())[:8]}")
+
+    def _extract_text(d):
+        """Try every known location where Azure may place the response text."""
+        # Top-level shortcuts
+        if d.get("output_text"):
+            return d["output_text"]
+        # text.value (Responses API v2)
+        txt = d.get("text")
+        if isinstance(txt, dict) and txt.get("value"):
+            return txt["value"]
+        if isinstance(txt, str) and txt:
+            return txt
+        # output array
+        for item in d.get("output", []):
+            # message → content blocks
+            for block in item.get("content", []):
+                if block.get("type") in {"output_text", "text"} and block.get("text"):
+                    return block["text"]
+            if item.get("type") in {"output_text", "text"} and item.get("text"):
+                return item["text"]
+        # Chat Completions fallback
+        if d.get("choices"):
+            return d["choices"][0]["message"]["content"]
+        return None
+
+    text = _extract_text(data)
+    if text:
+        return text
+
+    # If incomplete, still try to return whatever partial text was generated
     if data.get("status") == "incomplete":
-        reason = data.get("incomplete_details", {}).get("reason", "unknown")
-        return f"Response incomplete ({reason}). Try increasing max_output_tokens."
+        partial = _extract_text(data)  # already tried above, but keep for clarity
+        if partial:
+            return partial
+        reason = data.get("incomplete_details", {}).get("reason", "max_tokens")
+        print(f"[ai_chat] Azure incomplete ({reason}) — no partial text available")
+        return None  # let local fallback handle it
+
+    print(f"[ai_chat] Azure: could not parse text. Keys: {list(data.keys())}")
     return None
 
 
@@ -233,21 +290,34 @@ def _local_fallback(county_payload: dict) -> str:
 
 # ── Public entry point ────────────────────────────────────────────────────────
 def ask_county_summary(county_payload: dict) -> str:
-    user_text = (
-        "County risk data:\n"
-        f"{county_payload}\n\n"
-        "Explain the situation and recommend actions."
+    # Build a compact summary — avoids burning tokens on raw dict formatting
+    county  = county_payload.get("county", "Unknown County")
+    state   = county_payload.get("state", "")
+    risk    = float(county_payload.get("risk", 0))
+    source  = county_payload.get("energy_source", "grid")
+    wx      = county_payload.get("weather_summary", {})
+    prompt  = county_payload.get("prompt", "")
+
+    summary = (
+        f"Location: {county}, {state} | Risk: {risk*100:.1f}% | Energy: {source} | "
+        f"Wind: {wx.get('max_wind','?')} m/s | Temp: {wx.get('max_temp_c','?')}°C | "
+        f"Precip: {wx.get('total_precip_72h','?')}mm | NWS alerts: {wx.get('active_alerts',0)}"
     )
-    if county_payload.get("prompt"):
-        user_text += f"\n\nUser question: {county_payload['prompt']}"
+    user_text = summary
+    if prompt:
+        user_text += f"\n\nQuestion: {prompt}"
+    else:
+        user_text += "\n\nBriefly assess the risk and give 3 action steps."
 
     # Try each provider in order; fall back to local engine
     for provider_fn in (_try_azure, _try_openai):
         try:
             result = provider_fn(user_text)
             if result:
+                print(f"[ai_chat] Success via {provider_fn.__name__}")
                 return result
         except Exception as e:
-            print(f"[ai_chat] {provider_fn.__name__} failed: {e}")
+            print(f"[ai_chat] {provider_fn.__name__} FAILED: {type(e).__name__}: {e}")
 
+    print("[ai_chat] All providers failed — using local rule-based engine")
     return _local_fallback(county_payload)
