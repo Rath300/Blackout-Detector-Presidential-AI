@@ -43,14 +43,16 @@ export default function Monitor() {
         const temp  = temps[i]  ?? 20
         const cloud = clouds[i] ?? 0
 
-        const windScore  = Math.min(Math.max(wind / 25, gust / 35), 1)
-        const precipScore = Math.min(prec / 5, 1)
+        // Mirror backend calibration: 0 below threshold, 1.0 at severe event
+        const windScore   = Math.min(Math.max(Math.max(wind - 20, 0) / 60, Math.max(gust - 25, 0) / 55), 1)
+        const precipScore = Math.min(Math.max(prec - 5, 0) / 45, 1)
         const cloudScore  = cloud / 100
-        const heatRisk   = Math.max(0, (temp - 38) / 10)
-        const freezeRisk = Math.max(0, (0 - temp) / 20)
-        const tempScore  = Math.min(Math.max(heatRisk, freezeRisk), 1)
+        const heatRisk    = Math.max(0, (temp - 35) / 15)
+        const freezeRisk  = Math.max(0, (-5 - temp) / 20)
+        const tempScore   = Math.min(Math.max(heatRisk, freezeRisk), 1)
 
-        const est = Math.min((ww * windScore + pw * precipScore + cw * cloudScore + tw * tempScore) * riskSensitivity, 1)
+        const raw = ww * windScore + pw * precipScore + cw * cloudScore + tw * tempScore
+        const est = Math.min(raw * 0.45 * riskSensitivity, 1)  // match backend 0.45 damping
 
         return {
           hour: new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", hour12: true }),

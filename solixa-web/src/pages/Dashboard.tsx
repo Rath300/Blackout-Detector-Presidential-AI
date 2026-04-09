@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { MapContainer, TileLayer, GeoJSON, CircleMarker, Popup, useMapEvents } from "react-leaflet"
+import { MapContainer, TileLayer, GeoJSON, CircleMarker, Popup, useMapEvents, useMap } from "react-leaflet"
 import * as L from "leaflet"
 import type { GeoJsonObject } from "geojson"
 import "leaflet/dist/leaflet.css"
@@ -30,16 +30,26 @@ const EMERGENCY_AREAS = [
 ]
 
 const RISK_LEGEND = [
-  { label: "0–15%", color: "#22c55e" }, { label: "15–30%", color: "#4ade80" },
-  { label: "30–50%", color: "#facc15" }, { label: "50–70%", color: "#f97316" },
-  { label: "70%+",  color: "#dc2626" },
+  { label: "< 15%  Low",       color: "#22c55e" },
+  { label: "15–20%  Moderate", color: "#facc15" },
+  { label: "20–25%  Elevated", color: "#f97316" },
+  { label: "25%+  High",       color: "#dc2626" },
 ]
 
-// ── MapClickHandler (memoised to avoid re-binding on every render) ─────────────
+// ── MapClickHandler ────────────────────────────────────────────────────────────
 function MapClickHandler({ onMapClick }: { onMapClick: (lat: number, lon: number) => void }) {
   useMapEvents({
     click(e) { onMapClick(e.latlng.lat, e.latlng.lng) },
   })
+  return null
+}
+
+// ── FlyToLocation — syncs mapCenter state → actual Leaflet view ────────────────
+function FlyToLocation({ center }: { center: [number, number] }) {
+  const map = useMap()
+  useEffect(() => {
+    map.flyTo(center, map.getZoom(), { animate: true, duration: 1.0 })
+  }, [center[0], center[1]])
   return null
 }
 
@@ -74,6 +84,7 @@ export default function Dashboard() {
   } = useApp()
 
   const [searchQuery, setSearchQuery]   = useState("")
+  const [searchStatus, setSearchStatus] = useState("")
   const [stateCode, setStateCode]       = useState("")
   const [geoJson, setGeoJson]           = useState<GeoJsonObject | null>(null)
   const [geoJsonKey, setGeoJsonKey]     = useState("empty")   // forces re-mount when risk data loads
@@ -178,13 +189,24 @@ export default function Dashboard() {
   // ── Geocode search ──────────────────────────────────────────────────────────
   const handleGeocode = async () => {
     if (!searchQuery.trim()) return
-    const res = await fetch(`${API_BASE}/geocode?query=${encodeURIComponent(searchQuery)}`)
-    if (!res.ok) return
-    const data = await res.json()
-    const first = data.results?.[0]
-    if (first) {
-      setMapCenter([parseFloat(first.lat), parseFloat(first.lon)])
-      setSelectedLocation(first.display_name)
+    setSearchStatus("Searching…")
+    try {
+      const res = await fetch(`${API_BASE}/geocode?query=${encodeURIComponent(searchQuery)}`)
+      if (!res.ok) { setSearchStatus("Search failed — backend unreachable"); return }
+      const data = await res.json()
+      const first = data.results?.[0]
+      if (first) {
+        const lat = parseFloat(first.lat)
+        const lon = parseFloat(first.lon)
+        setMapCenter([lat, lon])
+        setSelectedLocation(first.display_name ?? searchQuery)
+        setSearchStatus("")
+        setSearchQuery("")
+      } else {
+        setSearchStatus(`No results for "${searchQuery}"`)
+      }
+    } catch {
+      setSearchStatus("Search error — check connection")
     }
   }
 
@@ -358,8 +380,13 @@ export default function Dashboard() {
 
       {/* Control bar */}
       <div className="bg-white rounded-xl border border-stone-200 px-4 py-2.5 flex flex-wrap items-center gap-3">
-        <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onKeyDown={e => e.key === "Enter" && handleGeocode()} placeholder="Search city or address…" className="max-w-[220px] h-8 text-sm border-stone-200 placeholder:text-stone-400" />
-        <Button variant="outline" size="sm" onClick={handleGeocode} className="h-8 border-stone-200 text-stone-600 hover:text-green-700 hover:border-green-600">Search</Button>
+        <div className="flex flex-col gap-0.5">
+          <div className="flex gap-1.5">
+            <Input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setSearchStatus("") }} onKeyDown={e => e.key === "Enter" && handleGeocode()} placeholder="Search city or address…" className="max-w-[220px] h-8 text-sm border-stone-200 placeholder:text-stone-400" />
+            <Button variant="outline" size="sm" onClick={handleGeocode} className="h-8 border-stone-200 text-stone-600 hover:text-green-700 hover:border-green-600">Search</Button>
+          </div>
+          {searchStatus && <span className={`text-xs pl-1 ${searchStatus.startsWith("No results") || searchStatus.includes("error") || searchStatus.includes("failed") ? "text-red-500" : "text-stone-400"}`}>{searchStatus}</span>}
+        </div>
         <div className="w-px h-4 bg-stone-200" />
         <span className="text-xs text-stone-400">Sensitivity</span>
         <input type="range" min="0.7" max="1.3" step="0.05" value={riskSensitivity} onChange={e => setRiskSensitivity(parseFloat(e.target.value))} className="w-24 accent-green-700" />
@@ -399,6 +426,7 @@ export default function Dashboard() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               <MapClickHandler onMapClick={handleMapClick} />
+              <FlyToLocation center={mapCenter} />
               <CircleMarker center={mapCenter} radius={8} pathOptions={{ color: "#15803d", fillColor: "#22c55e", fillOpacity: 0.9, weight: 2 }}>
                 <Popup><span className="text-sm font-medium">{selectedLocation}</span></Popup>
               </CircleMarker>
